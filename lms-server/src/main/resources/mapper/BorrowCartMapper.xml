@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neko.mapper.BorrowCartMapper">
+    <select id="list" resultType="com.neko.entity.BorrowCart"> select * from borrow_cart <where>
+            <if test="userId != null"> and user_id = #{userId} </if>
+            <if test="bookId != null"> and
+        book_id = #{bookId} </if>
+        </where>
+    </select>
+
+    <insert id="insertBatch" parameterType="list"> insert into borrow_cart (name, user_id, book_id,
+        number, amount, image, create_time) values <foreach collection="borrowCartList" item="bc"
+            separator=",">
+        (#{bc.name},#{bc.userId},#{bc.bookId},#{bc.number},#{bc.amount},#{bc.image},#{bc.createTime})
+            </foreach>
+    </insert>
+</mapper>

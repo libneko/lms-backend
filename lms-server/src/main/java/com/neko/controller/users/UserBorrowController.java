@@ -1,0 +1,72 @@
+package com.neko.controller.users;
+
+import com.neko.dto.BorrowSubmitDTO;
+import com.neko.result.PageResult;
+import com.neko.result.Result;
+import com.neko.service.BorrowService;
+import com.neko.vo.BorrowSubmitVO;
+import com.neko.vo.BorrowVO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/user/borrow")
+@Slf4j
+public class UserBorrowController {
+
+    private final BorrowService borrowService;
+
+    public UserBorrowController(BorrowService borrowService) {
+        this.borrowService = borrowService;
+    }
+
+    /**
+     * 借书
+     * 状态：BORROWED
+     */
+    @PostMapping("/borrow")
+    public Result<BorrowSubmitVO> borrow(@RequestBody BorrowSubmitDTO borrowSubmitDTO) {
+        log.info("User borrow book: {}", borrowSubmitDTO);
+        BorrowSubmitVO borrowSubmitVO = borrowService.borrow(borrowSubmitDTO);
+        return Result.success(borrowSubmitVO);
+    }
+
+    /**
+     * 借阅历史查询
+     *
+     * @param page
+     * @param pageSize
+     * @param status   借阅状态
+     * @return
+     */
+    @GetMapping("/history")
+    public Result<PageResult<BorrowVO>> page(int page, int pageSize, Integer status) {
+        log.info("user search borrow history: page={}, pageSize={}, status={}", page, pageSize, status);
+        PageResult<BorrowVO> pageResult = borrowService.pageQuery4User(page, pageSize, status);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 借阅详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/detail/{id}")
+    public Result<BorrowVO> detail(@PathVariable Long id) {
+        BorrowVO borrowVO = borrowService.detail(id);
+        return Result.success(borrowVO);
+    }
+
+    /**
+     * 完成归还
+     * 状态变化：BORROWED/OVERDUE -> RETURNED
+     *
+     * @return
+     */
+    @PutMapping("/complete/{id}")
+    public Result<Object> complete(@PathVariable Long id) {
+        borrowService.complete(id);
+        return Result.success();
+    }
+}

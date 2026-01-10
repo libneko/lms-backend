@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: lms-server
+
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: ${lms.datasource.driver-class-name}
+    url: jdbc:postgresql://${lms.datasource.host}:${lms.datasource.port}/${lms.datasource.database}?currentSchema=public
+    username: ${lms.datasource.username}
+    password: ${lms.datasource.password}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1762993226@qq.com
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+opensearch:
+  url: http://localhost:9200
+  username: admin
+  password: ${OPENSEARCH_PASSWORD}
+
+lms:
+  jwt:
+    admin-secret-key: admin
+    admin-ttl: 7200000
+    admin-token-name: authentication
+
+    user-secret-key: user
+    user-ttl: 7200000
+    user-token-name: token
+  s3:
+    endpoint: ${lms.s3.endpoint}
+    access-key-id: ${lms.s3.access-key-id}
+    access-key-secret: ${lms.s3.access-key-secret}
+    bucket-name: ${lms.s3.bucket-name}

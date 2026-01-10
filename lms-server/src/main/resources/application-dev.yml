@@ -1,0 +1,20 @@
+lms:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    host: localhost
+    port: 5432
+    database: lms
+    username: postgres
+    password: pgsql
+  s3:
+    endpoint: "oss-cn-hangzhou.aliyuncs.com"
+    access-key-id: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
+    access-key-secret: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
+    bucket-name: neko-book
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 10
