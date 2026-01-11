@@ -3,6 +3,7 @@ package com.neko.service.impl;
 import com.neko.constant.MessageConstant;
 import com.neko.context.BaseContext;
 import com.neko.dto.BorrowPageQueryDTO;
+import com.neko.dto.BorrowSubmitDTO;
 import com.neko.entity.Book;
 import com.neko.entity.BorrowDetail;
 import com.neko.entity.BorrowRecord;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,20 +50,40 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
-    public BorrowSubmitVO borrow() {
+    public BorrowSubmitVO borrow(BorrowSubmitDTO borrowSubmitDTO) {
         // 查询借阅车数据
         Long userId = BaseContext.getCurrentId();
         BorrowCart borrowCart = new BorrowCart();
         borrowCart.setUserId(userId);
-        List<BorrowCart> list = borrowCartMapper.list(borrowCart);
-        if (list == null || list.isEmpty()) {
+        List<BorrowCart> allCartItems = borrowCartMapper.list(borrowCart);
+
+        if (allCartItems == null || allCartItems.isEmpty()) {
             throw new BorrowCartBusinessException(MessageConstant.BORROW_CART_IS_NULL);
+        }
+
+        // 根据参数决定要借阅的图书列表
+        List<BorrowCart> itemsToBorrow;
+        boolean borrowAll = (borrowSubmitDTO == null || borrowSubmitDTO.getBookIds() == null
+                || borrowSubmitDTO.getBookIds().isEmpty());
+
+        if (borrowAll) {
+            // 借阅全部
+            itemsToBorrow = allCartItems;
+        } else {
+            // 选择性借阅
+            itemsToBorrow = allCartItems.stream()
+                    .filter(item -> borrowSubmitDTO.getBookIds().contains(item.getBookId()))
+                    .collect(Collectors.toList());
+
+            if (itemsToBorrow.isEmpty()) {
+                throw new BorrowCartBusinessException("选中的图书不在借阅车中");
+            }
         }
 
         // 查询用户信息
         User user = userMapper.getById(userId);
 
-        // 插入数据
+        // 插入借阅记录数据
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setBorrowTime(LocalDateTime.now());
         borrowRecord.setStatus(BorrowStatus.BORROWED.getCode());
@@ -74,7 +96,7 @@ public class BorrowServiceImpl implements BorrowService {
         borrowRecordMapper.insert(borrowRecord);
 
         // 检查所有图书库存是否足够
-        for (BorrowCart cart : list) {
+        for (BorrowCart cart : itemsToBorrow) {
             Book book = bookMapper.getById(cart.getBookId());
             if (book == null) {
                 throw new BorrowBusinessException(String.format(MessageConstant.BOOK_NOT_FOUND, cart.getName()));
@@ -85,8 +107,9 @@ public class BorrowServiceImpl implements BorrowService {
             }
         }
 
+        // 创建借阅明细并减少库存
         List<BorrowDetail> borrowDetailList = new ArrayList<>();
-        for (BorrowCart cart : list) {
+        for (BorrowCart cart : itemsToBorrow) {
             BorrowDetail borrowDetail = new BorrowDetail();
             BeanUtils.copyProperties(cart, borrowDetail);
             borrowDetail.setBorrowRecordId(borrowRecord.getId());
@@ -98,7 +121,14 @@ public class BorrowServiceImpl implements BorrowService {
 
         borrowDetailMapper.insertBatch(borrowDetailList);
 
-        borrowCartMapper.deleteByUserId(userId);
+        // 根据借阅模式删除借阅车中的图书
+        if (borrowAll) {
+            // 借阅全部，清空借阅车
+            borrowCartMapper.deleteByUserId(userId);
+        } else {
+            // 选择性借阅，只删除已借阅的图书
+            borrowCartMapper.deleteByUserIdAndBookIds(userId, borrowSubmitDTO.getBookIds());
+        }
 
         return BorrowSubmitVO.builder()
                 .id(borrowRecord.getId())

@@ -1,12 +1,21 @@
 package com.neko.service;
 
 import com.neko.dto.BorrowPageQueryDTO;
+import com.neko.dto.BorrowSubmitDTO;
 import com.neko.result.PageResult;
 import com.neko.vo.BorrowSubmitVO;
 import com.neko.vo.BorrowVO;
 
+import java.util.List;
+
 public interface BorrowService {
-    BorrowSubmitVO borrow();
+    /**
+     * 借阅图书
+     * 
+     * @param borrowSubmitDTO 可选参数，如果传入则只借阅指定的图书，如果为null则借阅车中所有图书
+     * @return 借阅提交结果
+     */
+    BorrowSubmitVO borrow(BorrowSubmitDTO borrowSubmitDTO);
 
     /**
      * 用户端借阅分页查询

@@ -1,6 +1,7 @@
 package com.neko.controller.users;
 
 import com.neko.dto.BorrowPageQueryDTO;
+import com.neko.dto.BorrowSubmitDTO;
 import com.neko.result.PageResult;
 import com.neko.result.Result;
 import com.neko.service.BorrowService;
@@ -22,12 +23,13 @@ public class UserBorrowController {
 
     /**
      * 借书
+     * 如果传入bookIds则只借阅指定的图书，否则借阅车中所有图书
      * 状态：BORROWED
      */
     @PostMapping("/borrow")
-    public Result<BorrowSubmitVO> borrow() {
-        log.info("User borrow book");
-        BorrowSubmitVO borrowSubmitVO = borrowService.borrow();
+    public Result<BorrowSubmitVO> borrow(@RequestBody(required = false) BorrowSubmitDTO borrowSubmitDTO) {
+        log.info("User borrow book: {}", borrowSubmitDTO);
+        BorrowSubmitVO borrowSubmitVO = borrowService.borrow(borrowSubmitDTO);
         return Result.success(borrowSubmitVO);
     }
 

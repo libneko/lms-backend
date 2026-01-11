@@ -16,4 +16,13 @@
             (#{bc.name}, #{bc.userId}, #{bc.bookId}, #{bc.number}, #{bc.image}, #{bc.createTime})
         </foreach>
     </insert>
+
+    <delete id="deleteByUserIdAndBookIds">
+        delete from borrow_cart
+        where user_id = #{userId}
+        and book_id in
+        <foreach collection="bookIds" item="bookId" open="(" separator="," close=")">
+            #{bookId}
+        </foreach>
+    </delete>
 </mapper>

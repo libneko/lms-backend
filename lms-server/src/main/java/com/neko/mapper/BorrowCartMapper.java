@@ -24,6 +24,14 @@ public interface BorrowCartMapper {
     void deleteByUserId(Long userId);
 
     /**
+     * 根据用户ID和图书ID列表批量删除借阅车中的图书
+     *
+     * @param userId  用户ID
+     * @param bookIds 图书ID列表
+     */
+    void deleteByUserIdAndBookIds(Long userId, List<Long> bookIds);
+
+    /**
      * 批量插入借阅车数据
      *
      * @param borrowCartList
