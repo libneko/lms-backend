@@ -11,12 +11,10 @@ public interface BorrowService {
     /**
      * 用户端借阅分页查询
      *
-     * @param pageNum
-     * @param pageSize
-     * @param status
+     * @param borrowPageQueryDTO
      * @return
      */
-    PageResult<BorrowVO> pageQuery4User(int pageNum, int pageSize, Integer status);
+    PageResult<BorrowVO> pageQuery4User(BorrowPageQueryDTO borrowPageQueryDTO);
 
     /**
      * 查询借阅详情

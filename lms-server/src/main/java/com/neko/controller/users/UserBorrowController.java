@@ -1,5 +1,6 @@
 package com.neko.controller.users;
 
+import com.neko.dto.BorrowPageQueryDTO;
 import com.neko.result.PageResult;
 import com.neko.result.Result;
 import com.neko.service.BorrowService;
@@ -33,15 +34,13 @@ public class UserBorrowController {
     /**
      * 借阅历史查询
      *
-     * @param page
-     * @param pageSize
-     * @param status   借阅状态
+     * @param borrowPageQueryDTO
      * @return
      */
     @GetMapping("/history")
-    public Result<PageResult<BorrowVO>> page(int page, int pageSize, Integer status) {
-        log.info("user search borrow history: page={}, pageSize={}, status={}", page, pageSize, status);
-        PageResult<BorrowVO> pageResult = borrowService.pageQuery4User(page, pageSize, status);
+    public Result<PageResult<BorrowVO>> page(BorrowPageQueryDTO borrowPageQueryDTO) {
+        log.info("user search borrow history: {}", borrowPageQueryDTO);
+        PageResult<BorrowVO> pageResult = borrowService.pageQuery4User(borrowPageQueryDTO);
         return Result.success(pageResult);
     }
 

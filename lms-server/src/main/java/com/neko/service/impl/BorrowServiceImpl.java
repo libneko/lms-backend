@@ -54,12 +54,16 @@ public class BorrowServiceImpl implements BorrowService {
             throw new BorrowCartBusinessException(MessageConstant.BORROW_CART_IS_NULL);
         }
 
+        // 查询用户信息
+        User user = userMapper.getById(userId);
+
         // 插入数据
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setBorrowTime(LocalDateTime.now());
         borrowRecord.setStatus(BorrowStatus.BORROWED.getCode());
         borrowRecord.setNumber(String.valueOf(System.currentTimeMillis()));
         borrowRecord.setUserId(userId);
+        borrowRecord.setUserName(user.getUsername());
         borrowRecord.setDueDate(LocalDateTime.now().plusMonths(1)); // 设置到期时间为1个月后
         borrowRecord.setRenewCount(0); // 初始续借次数为0
 
@@ -85,14 +89,10 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
-    public PageResult<BorrowVO> pageQuery4User(int pageNum, int pageSize, Integer status) {
+    public PageResult<BorrowVO> pageQuery4User(BorrowPageQueryDTO borrowPageQueryDTO) {
         // 设置分页
-        BorrowPageQueryDTO borrowPageQueryDTO = new BorrowPageQueryDTO();
         borrowPageQueryDTO.setUserId(BaseContext.getCurrentId());
-        borrowPageQueryDTO.setStatus(status);
-        borrowPageQueryDTO.setPage(pageNum);
-        borrowPageQueryDTO.setPageSize(pageSize);
-        borrowPageQueryDTO.setOffset((pageNum - 1) * pageSize);
+        borrowPageQueryDTO.setOffset((borrowPageQueryDTO.getPage() - 1) * borrowPageQueryDTO.getPageSize());
 
         // 分页条件查询
         Long total = borrowRecordMapper.count(borrowPageQueryDTO);
