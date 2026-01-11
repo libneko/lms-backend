@@ -3,6 +3,7 @@ package com.neko.service.impl;
 import com.neko.constant.MessageConstant;
 import com.neko.context.BaseContext;
 import com.neko.dto.BorrowPageQueryDTO;
+import com.neko.entity.Book;
 import com.neko.entity.BorrowDetail;
 import com.neko.entity.BorrowRecord;
 import com.neko.entity.BorrowCart;
@@ -71,6 +72,18 @@ public class BorrowServiceImpl implements BorrowService {
         borrowRecord.setRenewCount(0); // 初始续借次数为0
 
         borrowRecordMapper.insert(borrowRecord);
+
+        // 检查所有图书库存是否足够
+        for (BorrowCart cart : list) {
+            Book book = bookMapper.getById(cart.getBookId());
+            if (book == null) {
+                throw new BorrowBusinessException(String.format(MessageConstant.BOOK_NOT_FOUND, cart.getName()));
+            }
+            if (book.getStock() == null || book.getStock() < cart.getNumber()) {
+                throw new BorrowBusinessException(String.format(MessageConstant.BOOK_STOCK_NOT_ENOUGH,
+                        cart.getName(), book.getStock() == null ? 0 : book.getStock(), cart.getNumber()));
+            }
+        }
 
         List<BorrowDetail> borrowDetailList = new ArrayList<>();
         for (BorrowCart cart : list) {

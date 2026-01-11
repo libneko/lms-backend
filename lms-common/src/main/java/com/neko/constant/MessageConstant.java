@@ -13,6 +13,8 @@ public class MessageConstant {
     public static final String BORROW_STATUS_ERROR = "Borrow status error";
     public static final String BORROW_NOT_FOUND = "Borrow record not found";
     public static final String BORROW_DUE_DATE_NULL = "借阅记录缺少到期时间";
+    public static final String BOOK_NOT_FOUND = "图书不存在: %s";
+    public static final String BOOK_STOCK_NOT_ENOUGH = "图书库存不足: %s (当前库存: %d, 需要: %d)";
     public static final String USER_IS_ACTIVE = "User is active";
     public static final String VERIFY_CODE_ERROR = "Verify code error";
 }
