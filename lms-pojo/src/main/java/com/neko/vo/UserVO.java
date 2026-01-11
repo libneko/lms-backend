@@ -26,4 +26,6 @@ public class UserVO implements Serializable {
     private String avatar;
 
     private Integer status;
+
+    private Integer overdueCount;
 }
