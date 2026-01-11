@@ -1,8 +1,10 @@
 package com.neko.controller.users;
 
+import com.neko.constant.MessageConstant;
 import com.neko.dto.BookPageQueryDTO;
 import com.neko.entity.Book;
 import com.neko.enums.Status;
+import com.neko.exception.BookBusinessException;
 import com.neko.result.PageResult;
 import com.neko.result.Result;
 import com.neko.service.BookService;
@@ -34,6 +36,17 @@ public class UserBookController {
     public Result<BookVO> getById(@PathVariable Long id) {
         log.info("user get book by id: {}", id);
         BookVO bookVO = bookService.getById(id);
+
+        // 检查图书状态：必须是启用状态
+        if (bookVO.getStatus() == null || !bookVO.getStatus().equals(Status.ENABLE.getCode())) {
+            throw new BookBusinessException(MessageConstant.BOOK_NOT_AVAILABLE);
+        }
+
+        // 检查库存：必须大于0
+        if (bookVO.getStock() == null || bookVO.getStock() <= 0) {
+            throw new BookBusinessException(MessageConstant.BOOK_NOT_AVAILABLE);
+        }
+
         return Result.success(bookVO);
     }
 
