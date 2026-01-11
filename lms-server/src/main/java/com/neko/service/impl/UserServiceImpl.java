@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             // 用户不存在，自动注册用户
             user = new User();
-            user.setUsername("小书架用户_" + CodeUtil.generate(8));
+            user.setUsername("图书馆用户_" + CodeUtil.generate(8));
             user.setEmail(email);
             user.setAvatar(avatar);
             user.setStatus(Status.ENABLE.getCode());

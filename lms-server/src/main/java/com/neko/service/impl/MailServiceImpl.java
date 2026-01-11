@@ -37,7 +37,7 @@ public class MailServiceImpl implements MailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(email);
-        message.setSubject("小书架");
+        message.setSubject("图书馆");
         message.setText(code + "为您的验证码，请您于" + timeout + "分钟内填写。如非本人操作，请忽略本短信。");
 
         javaMailSender.send(message);
