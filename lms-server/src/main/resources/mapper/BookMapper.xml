@@ -10,10 +10,12 @@
     </insert>
 
     <select id="pageQuery" resultType="com.neko.vo.BookVO">
-        select b .* , c.name as categoryName from book b left outer join category c on d.category_id = c.id
+        select b.*, c.name as categoryName
+        from book b
+        left outer join category c on b.category_id = c.id
         <where>
             <if test="name != null">
-                and b.name like concat('%',#{name},'')
+                and b.name like concat('%', #{name}, '%')
             </if>
             <if test="categoryId != null">
                 and b.category_id = #{categoryId}
@@ -85,11 +87,12 @@
     </select>
 
     <select id="randomList" resultType="com.neko.entity.Book">
-        WITH random_ids AS (SELECT id
-                            FROM book
-                            WHERE id >= floor(random() * (SELECT max(id) FROM book)):: int
+        WITH random_ids AS (
+            SELECT id
+            FROM book
+            WHERE id >= floor(random() * (SELECT max(id) FROM book))::int
             LIMIT #{n}
-            )
+        )
         SELECT *
         FROM book
         WHERE id IN (SELECT id FROM random_ids)
