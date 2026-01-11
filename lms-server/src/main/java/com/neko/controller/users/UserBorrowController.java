@@ -68,4 +68,18 @@ public class UserBorrowController {
         borrowService.complete(id);
         return Result.success();
     }
+
+    /**
+     * 续借
+     * 要求：剩余借阅时间在7天内才可以续借，续借延长1个月
+     *
+     * @param id 借阅记录id
+     * @return 续借结果
+     */
+    @PutMapping("/renew/{id}")
+    public Result<Boolean> renew(@PathVariable Long id) {
+        log.info("用户续借，借阅记录 id: {}", id);
+        boolean success = borrowService.renew(id);
+        return Result.success(success);
+    }
 }

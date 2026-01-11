@@ -746,11 +746,13 @@ CREATE TABLE borrow_details
 DROP TABLE IF EXISTS borrow_records;
 CREATE TABLE borrow_records
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- 主键
-    number      VARCHAR(50),                                     -- 借阅号
-    status      INT       NOT NULL DEFAULT 1,                    -- 借阅状态 1已借出 2已归还 3已逾期
-    user_id     BIGINT    NOT NULL,                              -- 借阅用户
-    borrow_time TIMESTAMP NOT NULL,                              -- 借阅时间
-    user_name   VARCHAR(32),                                     -- 用户名称
-    return_time TIMESTAMP                                        -- 归还时间
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- 主键
+    number        VARCHAR(50),                                     -- 借阅号
+    status        INT       NOT NULL DEFAULT 1,                    -- 借阅状态 1已借出 2已归还 3已逾期
+    user_id       BIGINT    NOT NULL,                              -- 借阅用户
+    borrow_time   TIMESTAMP NOT NULL,                              -- 借阅时间
+    user_name     VARCHAR(32),                                     -- 用户名称
+    return_time   TIMESTAMP,                                       -- 归还时间
+    due_date      TIMESTAMP,                                       -- 到期时间
+    renew_count   INT       NOT NULL DEFAULT 0                     -- 续借次数
 );

@@ -4,14 +4,18 @@
 
     <insert id="insert" parameterType="com.neko.entity.BorrowRecord" useGeneratedKeys="true"
         keyProperty="id"> insert into borrow_records (number, status, user_id, borrow_time,
-        user_name, return_time) values (#{number}, #{status}, #{userId}, #{borrowTime}, #{userName},
-        #{returnTime}) </insert>
+        user_name, return_time, due_date, renew_count) values (#{number}, #{status}, #{userId},
+        #{borrowTime}, #{userName}, #{returnTime}, #{dueDate}, #{renewCount}) </insert>
 
     <update id="update" parameterType="com.neko.entity.BorrowRecord"> update borrow_records <set>
             <if test="status != null"> status=#{status}, </if>
             <if test="returnTime != null">
         return_time=#{returnTime}, </if>
-        </set> where id=#{id} </update>
+            <if test="dueDate != null"> due_date=#{dueDate}, </if>
+            <if
+                test="renewCount != null"> renew_count=#{renewCount}, </if>
+        </set> where
+        id=#{id} </update>
 
     <select id="pageQuery" resultType="com.neko.entity.BorrowRecord"> select * from borrow_records <where>
             <if test="number != null and number!=''"> and number like concat('%',#{number},'%') </if>

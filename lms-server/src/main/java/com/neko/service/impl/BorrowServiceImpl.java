@@ -60,6 +60,8 @@ public class BorrowServiceImpl implements BorrowService {
         borrowRecord.setStatus(BorrowStatus.BORROWED.getCode());
         borrowRecord.setNumber(String.valueOf(System.currentTimeMillis()));
         borrowRecord.setUserId(userId);
+        borrowRecord.setDueDate(LocalDateTime.now().plusMonths(1)); // 设置到期时间为1个月后
+        borrowRecord.setRenewCount(0); // 初始续借次数为0
 
         borrowRecordMapper.insert(borrowRecord);
 
@@ -163,10 +165,10 @@ public class BorrowServiceImpl implements BorrowService {
             throw new BorrowBusinessException(MessageConstant.BORROW_STATUS_ERROR);
         }
 
-        // 判断是否逾期（借阅超过1个月）
-        LocalDateTime borrowTime = borrowRecordDB.getBorrowTime();
+        // 判断是否逾期（超过到期时间）
+        LocalDateTime dueDate = borrowRecordDB.getDueDate();
         LocalDateTime returnTime = LocalDateTime.now();
-        boolean isOverdue = returnTime.isAfter(borrowTime.plusMonths(1));
+        boolean isOverdue = dueDate != null && returnTime.isAfter(dueDate);
 
         // 如果逾期，更新用户逾期次数
         if (isOverdue) {
@@ -190,5 +192,40 @@ public class BorrowServiceImpl implements BorrowService {
         borrowRecord.setReturnTime(returnTime);
 
         borrowRecordMapper.update(borrowRecord);
+    }
+
+    @Override
+    public boolean renew(Long id) {
+        // 根据 id 查询借阅记录
+        BorrowRecord borrowRecordDB = borrowRecordMapper.getById(id);
+
+        if (borrowRecordDB == null ||
+                !borrowRecordDB.getStatus().equals(BorrowStatus.BORROWED.getCode())) {
+            throw new BorrowBusinessException(MessageConstant.BORROW_STATUS_ERROR);
+        }
+
+        // 获取到期时间
+        LocalDateTime dueDate = borrowRecordDB.getDueDate();
+        if (dueDate == null) {
+            throw new BorrowBusinessException(MessageConstant.BORROW_DUE_DATE_NULL);
+        }
+
+        // 判断是否可以续借：剩余时间在7天内
+        if (dueDate.isAfter(LocalDateTime.now().plusDays(7))) {
+            // 剩余时间超过7天，无法续借
+            log.info("续借失败：借阅记录 id={}, 剩余时间超过7天，无法续借", id);
+            return false;
+        }
+
+        // 可以续借，延长到期时间1个月
+        BorrowRecord updateRecord = new BorrowRecord();
+        updateRecord.setId(id);
+        updateRecord.setDueDate(borrowRecordDB.getDueDate().plusMonths(1));
+        updateRecord.setRenewCount((borrowRecordDB.getRenewCount() == null ? 0 : borrowRecordDB.getRenewCount()) + 1);
+
+        borrowRecordMapper.update(updateRecord);
+        log.info("续借成功，借阅记录 ID: {}, 新的到期时间: {}", id, updateRecord.getDueDate());
+
+        return true;
     }
 }

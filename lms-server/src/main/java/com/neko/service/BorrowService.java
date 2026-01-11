@@ -40,4 +40,12 @@ public interface BorrowService {
      * @param id
      */
     void complete(Long id);
+
+    /**
+     * 续借
+     *
+     * @param id 借阅记录 id
+     * @return true 续借成功，false 续借失败
+     */
+    boolean renew(Long id);
 }

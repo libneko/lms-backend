@@ -37,4 +37,10 @@ public class BorrowRecord implements Serializable {
 
     // 归还时间
     private LocalDateTime returnTime;
+
+    // 到期时间
+    private LocalDateTime dueDate;
+
+    // 续借次数
+    private Integer renewCount;
 }
