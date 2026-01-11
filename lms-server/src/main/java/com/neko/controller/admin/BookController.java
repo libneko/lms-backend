@@ -41,7 +41,7 @@ public class BookController {
     @GetMapping("/page")
     public Result<PageResult<BookVO>> page(BookPageQueryDTO bookPageQueryDTO) throws IOException {
         log.info("Paginated query of book(s): {}", bookPageQueryDTO);
-        PageResult<BookVO> pageResult = bookService.pageQuery(bookPageQueryDTO);
+        PageResult<BookVO> pageResult = bookService.pageQuery(bookPageQueryDTO, false);
         return Result.success(pageResult);
     }
 

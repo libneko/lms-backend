@@ -51,7 +51,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO) throws IOException {
+    public PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO, boolean filterOutOfStock) throws IOException {
         int from = (bookPageQueryDTO.getPage() - 1) * bookPageQueryDTO.getPageSize();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -66,6 +66,11 @@ public class BookServiceImpl implements BookService {
 
         if (bookPageQueryDTO.getStatus() != null) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("after.status", bookPageQueryDTO.getStatus()));
+        }
+
+        // 根据参数决定是否过滤无库存的书籍
+        if (filterOutOfStock) {
+            boolQueryBuilder.filter(QueryBuilders.rangeQuery("after.stock").gt(0));
         }
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()

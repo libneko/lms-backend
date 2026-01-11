@@ -81,7 +81,8 @@ public class UserBookController {
     @GetMapping("/page")
     public Result<PageResult<BookVO>> page(BookPageQueryDTO bookPageQueryDTO) throws IOException {
         log.info("Paginated query of book(s), {}", bookPageQueryDTO);
-        PageResult<BookVO> pageResult = bookService.pageQuery(bookPageQueryDTO);
+        // 用户端查询，需要过滤无库存的书籍
+        PageResult<BookVO> pageResult = bookService.pageQuery(bookPageQueryDTO, true);
         return Result.success(pageResult);
     }
 }

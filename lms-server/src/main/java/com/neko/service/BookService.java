@@ -12,7 +12,7 @@ import java.util.List;
 public interface BookService {
     void save(BookDTO bookDTO);
 
-    PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO) throws IOException;
+    PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO, boolean filterOutOfStock) throws IOException;
 
     void deleteBatch(List<Long> ids);
 
