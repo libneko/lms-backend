@@ -1,100 +1,70 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.neko.mapper.BookMapper">
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into book (name, author, category_id, image, description, status, create_time, update_time, stock,
-                          isbn, location, publisher)
-        values (#{name}, #{author}, #{categoryId}, #{image}, #{description}, #{status}, #{createTime},
-                #{updateTime}, #{stock}, #{isbn}, #{location}, #{publisher})
-    </insert>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"> insert into book (name, author,
+        category_id, image, description, status, create_time, update_time, stock, isbn, location,
+        publisher) values (#{name}, #{author}, #{categoryId}, #{image}, #{description}, #{status},
+        #{createTime}, #{updateTime}, #{stock}, #{isbn}, #{location}, #{publisher}) </insert>
 
-    <select id="pageQuery" resultType="com.neko.vo.BookVO">
-        select b.*, c.name as categoryName
-        from book b
-        left outer join category c on b.category_id = c.id
-        <where>
-            <if test="name != null">
-                and b.name like concat('%', #{name}, '%')
-            </if>
-            <if test="categoryId != null">
-                and b.category_id = #{categoryId}
-            </if>
-            <if test="status != null">
-                and b.status = #{status}
-            </if>
-        </where>
-        order by b.create_time desc
+    <select id="pageQuery" resultType="com.neko.vo.BookVO"> select b.*, c.name as categoryName from
+        book b left outer join category c on b.category_id = c.id <where>
+            <if test="name != null"> and b.name like concat('%', #{name}, '%') </if>
+            <if
+                test="categoryId != null"> and b.category_id = #{categoryId} </if>
+            <if
+                test="status != null"> and b.status = #{status} </if> and b.stock > 0 </where> order
+        by b.create_time desc </select>
+
+    <select id="getByIds"> select * from book where id in <foreach collection="list" item="id"
+            open="(" separator="," close=")"> #{id} </foreach>
     </select>
 
-    <select id="getByIds">
-        select * from book where id in
-        <foreach collection="list" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </select>
-
-    <delete id="deleteByIds">
-        delete from book where id in
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+    <delete id="deleteByIds"> delete from book where id in <foreach collection="ids" item="id"
+            open="(" separator="," close=")"> #{id} </foreach>
     </delete>
 
-    <update id="update">
-        update book
-        <set>
+    <update id="update"> update book <set>
             <if test="name != null">name = #{name},</if>
-            <if test="author != null">author = #{author},</if>
+            <if test="author != null">author =
+        #{author},</if>
             <if test="categoryId != null">category_id = #{categoryId},</if>
-            <if test="image != null">image = #{image},</if>
-            <if test="description != null">description = #{description},</if>
+            <if
+                test="image != null">image = #{image},</if>
+            <if test="description != null">description
+        = #{description},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
-            <if test="stock != null">stock = #{stock},</if>
+            <if
+                test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="stock != null">stock
+        = #{stock},</if>
             <if test="isbn != null">isbn = #{isbn},</if>
-            <if test="location != null">location = #{location},</if>
+            <if test="location != null">location
+        = #{location},</if>
             <if test="publisher != null">publisher = #{publisher}</if>
         </set>
-        where id = #{id}
+        where id = #{id} </update>
+
+    <select id="list" resultType="com.neko.entity.Book" parameterType="com.neko.entity.Book"> select
+        * from book <where>
+            <if test="name != null"> and name like concat('%',#{name},'%') </if>
+            <if
+                test="categoryId != null"> and category_id = #{categoryId} </if>
+            <if
+                test="status != null"> and status = #{status} </if> and stock > 0 </where>
+    </select>
+
+    <select id="countByMap" resultType="java.lang.Integer"> select count(id) from book <where>
+            <if test="status != null"> and status = #{status} </if>
+            <if test="categoryId != null">
+        and category_id = #{categoryId} </if> and stock > 0 </where>
+    </select>
+
+    <select id="randomList" resultType="com.neko.entity.Book"> WITH random_ids AS ( SELECT id FROM
+        book WHERE id >= floor(random() * (SELECT max(id) FROM book))::int AND stock > 0 LIMIT #{n}
+        ) SELECT * FROM book WHERE id IN (SELECT id FROM random_ids) </select>
+
+    <!-- 更新图书库存（正数增加，负数减少） -->
+    <update id="updateStock"> update book set stock = stock + #{quantity} where id = #{bookId} <if
+            test="quantity &lt; 0"> and stock >= -#{quantity} </if>
     </update>
-
-    <select id="list" resultType="com.neko.entity.Book" parameterType="com.neko.entity.Book">
-        select * from book
-        <where>
-            <if test="name != null">
-                and name like concat('%',#{name},'%')
-            </if>
-            <if test="categoryId != null">
-                and category_id = #{categoryId}
-            </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-        </where>
-    </select>
-
-    <select id="countByMap" resultType="java.lang.Integer">
-        select count(id) from book
-        <where>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-            <if test="categoryId != null">
-                and category_id = #{categoryId}
-            </if>
-        </where>
-    </select>
-
-    <select id="randomList" resultType="com.neko.entity.Book">
-        WITH random_ids AS (
-            SELECT id
-            FROM book
-            WHERE id >= floor(random() * (SELECT max(id) FROM book))::int
-            LIMIT #{n}
-        )
-        SELECT *
-        FROM book
-        WHERE id IN (SELECT id FROM random_ids)
-    </select>
 </mapper>

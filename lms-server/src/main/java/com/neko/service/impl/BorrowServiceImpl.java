@@ -14,6 +14,7 @@ import com.neko.mapper.BorrowDetailMapper;
 import com.neko.mapper.BorrowRecordMapper;
 import com.neko.mapper.BorrowCartMapper;
 import com.neko.mapper.UserMapper;
+import com.neko.mapper.BookMapper;
 import com.neko.result.PageResult;
 import com.neko.service.BorrowService;
 import com.neko.vo.BorrowSubmitVO;
@@ -33,14 +34,16 @@ public class BorrowServiceImpl implements BorrowService {
     private final BorrowRecordMapper borrowRecordMapper;
     private final BorrowDetailMapper borrowDetailMapper;
     private final UserMapper userMapper;
+    private final BookMapper bookMapper;
 
     public BorrowServiceImpl(BorrowCartMapper borrowCartMapper,
             BorrowRecordMapper borrowRecordMapper, BorrowDetailMapper borrowDetailMapper,
-            UserMapper userMapper) {
+            UserMapper userMapper, BookMapper bookMapper) {
         this.borrowCartMapper = borrowCartMapper;
         this.borrowRecordMapper = borrowRecordMapper;
         this.borrowDetailMapper = borrowDetailMapper;
         this.userMapper = userMapper;
+        this.bookMapper = bookMapper;
     }
 
     @Override
@@ -75,6 +78,9 @@ public class BorrowServiceImpl implements BorrowService {
             BeanUtils.copyProperties(cart, borrowDetail);
             borrowDetail.setBorrowRecordId(borrowRecord.getId());
             borrowDetailList.add(borrowDetail);
+
+            // 减少图书库存，使用 BorrowCart 中的数量
+            bookMapper.updateStock(cart.getBookId(), -cart.getNumber());
         }
 
         borrowDetailMapper.insertBatch(borrowDetailList);
@@ -186,12 +192,19 @@ public class BorrowServiceImpl implements BorrowService {
             userMapper.update(user);
         }
 
+        // 更新借阅记录状态为已归还
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setId(borrowRecordDB.getId());
         borrowRecord.setStatus(BorrowStatus.RETURNED.getCode());
         borrowRecord.setReturnTime(returnTime);
-
         borrowRecordMapper.update(borrowRecord);
+
+        // 查询借阅详情，增加图书库存
+        List<BorrowDetail> borrowDetailList = borrowDetailMapper.getByBorrowRecordId(id);
+        for (BorrowDetail borrowDetail : borrowDetailList) {
+            // 归还图书，增加库存，使用 BorrowDetail 中的数量
+            bookMapper.updateStock(borrowDetail.getBookId(), borrowDetail.getNumber());
+        }
     }
 
     @Override

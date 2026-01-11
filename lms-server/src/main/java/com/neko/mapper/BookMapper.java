@@ -14,7 +14,7 @@ import java.util.List;
 @Mapper
 public interface BookMapper {
 
-    @Select("select count(id) from book where category_id = #{categoryId}")
+    @Select("select count(id) from book where category_id = #{categoryId} and stock > 0")
     Integer countByCategoryId(Long categoryId);
 
     @AutoFill(value = OperationType.INSERT)
@@ -35,4 +35,12 @@ public interface BookMapper {
     void update(Book book);
 
     List<Book> randomList(Long number);
+
+    /**
+     * 更新图书库存
+     * 
+     * @param bookId   图书ID
+     * @param quantity 变化数量（正数为增加，负数为减少）
+     */
+    void updateStock(Long bookId, Integer quantity);
 }
