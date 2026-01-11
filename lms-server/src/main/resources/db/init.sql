@@ -740,8 +740,7 @@ CREATE TABLE borrow_details
     image            VARCHAR(255),                                    -- 图片
     borrow_record_id BIGINT NOT NULL,                                 -- 借阅记录id
     book_id          BIGINT,                                          -- 书本id
-    number           INT    NOT NULL DEFAULT 1,                       -- 数量
-    amount           DECIMAL(10, 2)                                   -- 金额
+    number           INT    NOT NULL DEFAULT 1                        -- 数量
 );
 
 DROP TABLE IF EXISTS borrow_records;

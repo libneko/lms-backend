@@ -175,7 +175,7 @@ public class BorrowServiceImpl implements BorrowService {
             User user = userMapper.getById(userId);
             int overdueCount = user.getOverdueCount() == null ? 0 : user.getOverdueCount();
             overdueCount++;
-            
+
             // 如果逾期次数达到2次，封禁账号
             if (overdueCount >= 2) {
                 user.setStatus(0); // 0表示禁用
