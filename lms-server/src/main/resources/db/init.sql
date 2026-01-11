@@ -37,7 +37,9 @@ CREATE TABLE book
     stock       BIGINT       NOT NULL CHECK (stock >= 0),                 -- 库存数量（不能为负数）
     isbn        VARCHAR(64)  NOT NULL,                                    -- ISBN
     location    VARCHAR(64)  NOT NULL,                                    -- 存放位置
-    publisher   VARCHAR(64)  NOT NULL                                     -- 出版社
+    publisher   VARCHAR(64)  NOT NULL,                                    -- 出版社
+    CONSTRAINT idx_book_isbn UNIQUE (isbn),                              -- ISBN唯一索引
+    CONSTRAINT idx_book_location UNIQUE (location)                       -- 存放位置唯一索引
 );
 
 INSERT INTO book (name, author, category_id, image, description, status, create_time, update_time, stock, isbn,
