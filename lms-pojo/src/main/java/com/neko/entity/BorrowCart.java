@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,8 +27,6 @@ public class BorrowCart implements Serializable {
     private Long bookId;
 
     private Integer number;
-
-    private BigDecimal amount;
 
     private String image;
 

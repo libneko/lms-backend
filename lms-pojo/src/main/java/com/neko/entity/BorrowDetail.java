@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -31,9 +30,6 @@ public class BorrowDetail implements Serializable {
 
     // 数量
     private Integer number;
-
-    // 金额
-    private BigDecimal amount;
 
     // 图片
     private String image;

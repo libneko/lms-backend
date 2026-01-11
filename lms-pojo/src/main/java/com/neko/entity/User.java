@@ -30,6 +30,8 @@ public class User implements Serializable {
 
     private Integer status;
 
+    private Integer overdueCount;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

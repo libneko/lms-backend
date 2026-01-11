@@ -3,9 +3,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.neko.mapper.BookMapper">
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into book (name, author, category_id, price, image, description, status, create_time, update_time, stock,
+        insert into book (name, author, category_id, image, description, status, create_time, update_time, stock,
                           isbn, location, publisher)
-        values (#{name}, #{author}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime},
+        values (#{name}, #{author}, #{categoryId}, #{image}, #{description}, #{status}, #{createTime},
                 #{updateTime}, #{stock}, #{isbn}, #{location}, #{publisher})
     </insert>
 
@@ -45,7 +45,6 @@
             <if test="name != null">name = #{name},</if>
             <if test="author != null">author = #{author},</if>
             <if test="categoryId != null">category_id = #{categoryId},</if>
-            <if test="price != null">price = #{price},</if>
             <if test="image != null">image = #{image},</if>
             <if test="description != null">description = #{description},</if>
             <if test="status != null">status = #{status},</if>

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,8 +21,6 @@ public class BookVO implements Serializable {
     private String author;
 
     private Long categoryId;
-
-    private BigDecimal price;
 
     private String image;
 

@@ -44,7 +44,6 @@ public class BorrowCartServiceImpl implements BorrowCartService {
             Book book = bookMapper.getById(bookId);
             borrowCart.setName(book.getName());
             borrowCart.setImage(book.getImage());
-            borrowCart.setAmount(book.getPrice());
 
             borrowCart.setNumber(borrowCartDTO.getNumber());
             borrowCart.setCreateTime(LocalDateTime.now());

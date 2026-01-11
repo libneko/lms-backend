@@ -3,7 +3,6 @@ package com.neko.dto;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Data
 public class BookDTO implements Serializable {
@@ -15,8 +14,6 @@ public class BookDTO implements Serializable {
     private String author;
 
     private Long categoryId;
-
-    private BigDecimal price;
 
     private String image;
 

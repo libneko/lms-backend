@@ -157,6 +157,12 @@ public class UserServiceImpl implements UserService {
                 .id(id)
                 .status(status)
                 .build();
+        
+        // 如果管理员将用户重新启用，清除逾期次数
+        if (status == 1) {
+            user.setOverdueCount(0);
+        }
+        
         userMapper.update(user);
     }
 }

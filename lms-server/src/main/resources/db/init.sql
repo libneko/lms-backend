@@ -695,6 +695,7 @@ CREATE TABLE users
     sex         INTEGER,                                             -- 性别
     avatar      VARCHAR(128),                                        -- 头像
     status      INT         NOT NULL DEFAULT 1,                      -- 状态 0:禁用，1:启用
+    overdue_count INT       NOT NULL DEFAULT 0,                      -- 逾期次数
     create_time TIMESTAMP,                                           -- 创建时间
     update_time TIMESTAMP,                                           -- 更新时间
     CONSTRAINT idx_username UNIQUE (username),                       -- 用户名唯一

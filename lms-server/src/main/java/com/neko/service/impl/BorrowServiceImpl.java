@@ -3,16 +3,17 @@ package com.neko.service.impl;
 import com.neko.constant.MessageConstant;
 import com.neko.context.BaseContext;
 import com.neko.dto.BorrowPageQueryDTO;
-import com.neko.dto.BorrowSubmitDTO;
 import com.neko.entity.BorrowDetail;
 import com.neko.entity.BorrowRecord;
 import com.neko.entity.BorrowCart;
+import com.neko.entity.User;
 import com.neko.enums.BorrowStatus;
 import com.neko.exception.BorrowBusinessException;
 import com.neko.exception.BorrowCartBusinessException;
 import com.neko.mapper.BorrowDetailMapper;
 import com.neko.mapper.BorrowRecordMapper;
 import com.neko.mapper.BorrowCartMapper;
+import com.neko.mapper.UserMapper;
 import com.neko.result.PageResult;
 import com.neko.service.BorrowService;
 import com.neko.vo.BorrowSubmitVO;
@@ -31,16 +32,19 @@ public class BorrowServiceImpl implements BorrowService {
     private final BorrowCartMapper borrowCartMapper;
     private final BorrowRecordMapper borrowRecordMapper;
     private final BorrowDetailMapper borrowDetailMapper;
+    private final UserMapper userMapper;
 
     public BorrowServiceImpl(BorrowCartMapper borrowCartMapper,
-            BorrowRecordMapper borrowRecordMapper, BorrowDetailMapper borrowDetailMapper) {
+            BorrowRecordMapper borrowRecordMapper, BorrowDetailMapper borrowDetailMapper,
+            UserMapper userMapper) {
         this.borrowCartMapper = borrowCartMapper;
         this.borrowRecordMapper = borrowRecordMapper;
         this.borrowDetailMapper = borrowDetailMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public BorrowSubmitVO borrow(BorrowSubmitDTO borrowSubmitDTO) {
+    public BorrowSubmitVO borrow() {
         // 查询借阅车数据
         Long userId = BaseContext.getCurrentId();
         BorrowCart borrowCart = new BorrowCart();
@@ -52,7 +56,6 @@ public class BorrowServiceImpl implements BorrowService {
 
         // 插入数据
         BorrowRecord borrowRecord = new BorrowRecord();
-        BeanUtils.copyProperties(borrowSubmitDTO, borrowRecord);
         borrowRecord.setBorrowTime(LocalDateTime.now());
         borrowRecord.setStatus(BorrowStatus.BORROWED.getCode());
         borrowRecord.setNumber(String.valueOf(System.currentTimeMillis()));
@@ -156,15 +159,35 @@ public class BorrowServiceImpl implements BorrowService {
         BorrowRecord borrowRecordDB = borrowRecordMapper.getById(id);
 
         if (borrowRecordDB == null ||
-                !(borrowRecordDB.getStatus().equals(BorrowStatus.BORROWED.getCode())
-                        || borrowRecordDB.getStatus().equals(BorrowStatus.OVERDUE.getCode()))) {
+                !borrowRecordDB.getStatus().equals(BorrowStatus.BORROWED.getCode())) {
             throw new BorrowBusinessException(MessageConstant.BORROW_STATUS_ERROR);
+        }
+
+        // 判断是否逾期（借阅超过1个月）
+        LocalDateTime borrowTime = borrowRecordDB.getBorrowTime();
+        LocalDateTime returnTime = LocalDateTime.now();
+        boolean isOverdue = returnTime.isAfter(borrowTime.plusMonths(1));
+
+        // 如果逾期，更新用户逾期次数
+        if (isOverdue) {
+            Long userId = borrowRecordDB.getUserId();
+            // 查询用户信息
+            User user = userMapper.getById(userId);
+            int overdueCount = user.getOverdueCount() == null ? 0 : user.getOverdueCount();
+            overdueCount++;
+            
+            // 如果逾期次数达到2次，封禁账号
+            if (overdueCount >= 2) {
+                user.setStatus(0); // 0表示禁用
+            }
+            user.setOverdueCount(overdueCount);
+            userMapper.update(user);
         }
 
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setId(borrowRecordDB.getId());
         borrowRecord.setStatus(BorrowStatus.RETURNED.getCode());
-        borrowRecord.setReturnTime(LocalDateTime.now());
+        borrowRecord.setReturnTime(returnTime);
 
         borrowRecordMapper.update(borrowRecord);
     }

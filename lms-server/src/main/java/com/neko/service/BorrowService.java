@@ -1,13 +1,12 @@
 package com.neko.service;
 
 import com.neko.dto.BorrowPageQueryDTO;
-import com.neko.dto.BorrowSubmitDTO;
 import com.neko.result.PageResult;
 import com.neko.vo.BorrowSubmitVO;
 import com.neko.vo.BorrowVO;
 
 public interface BorrowService {
-    BorrowSubmitVO borrow(BorrowSubmitDTO borrowSubmitDTO);
+    BorrowSubmitVO borrow();
 
     /**
      * 用户端借阅分页查询

@@ -1,6 +1,5 @@
 package com.neko.controller.users;
 
-import com.neko.dto.BorrowSubmitDTO;
 import com.neko.result.PageResult;
 import com.neko.result.Result;
 import com.neko.service.BorrowService;
@@ -25,9 +24,9 @@ public class UserBorrowController {
      * 状态：BORROWED
      */
     @PostMapping("/borrow")
-    public Result<BorrowSubmitVO> borrow(@RequestBody BorrowSubmitDTO borrowSubmitDTO) {
-        log.info("User borrow book: {}", borrowSubmitDTO);
-        BorrowSubmitVO borrowSubmitVO = borrowService.borrow(borrowSubmitDTO);
+    public Result<BorrowSubmitVO> borrow() {
+        log.info("User borrow book");
+        BorrowSubmitVO borrowSubmitVO = borrowService.borrow();
         return Result.success(borrowSubmitVO);
     }
 

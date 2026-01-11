@@ -9,9 +9,9 @@
     </select>
 
     <insert id="insertBatch" parameterType="list"> insert into borrow_cart (name, user_id, book_id,
-        number, amount, image, create_time) values <foreach collection="borrowCartList" item="bc"
+        number, image, create_time) values <foreach collection="borrowCartList" item="bc"
             separator=",">
-        (#{bc.name},#{bc.userId},#{bc.bookId},#{bc.number},#{bc.amount},#{bc.image},#{bc.createTime})
+        (#{bc.name},#{bc.userId},#{bc.bookId},#{bc.number},#{bc.image},#{bc.createTime})
             </foreach>
     </insert>
 </mapper>
