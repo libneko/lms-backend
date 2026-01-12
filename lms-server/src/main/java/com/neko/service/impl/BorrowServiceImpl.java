@@ -80,6 +80,26 @@ public class BorrowServiceImpl implements BorrowService {
             }
         }
 
+        // 检查用户是否有未归还的图书（防止重复借阅同一本书）
+        List<Long> borrowedBookIds = borrowDetailMapper.getBorrowedBookIdsByUserAndStatus(
+                userId, BorrowStatus.BORROWED.getCode());
+
+        if (borrowedBookIds != null && !borrowedBookIds.isEmpty()) {
+            // 检查待借阅的图书中是否有已借未还的
+            List<String> alreadyBorrowedBooks = new ArrayList<>();
+            for (BorrowCart cart : itemsToBorrow) {
+                if (borrowedBookIds.contains(cart.getBookId())) {
+                    alreadyBorrowedBooks.add(cart.getName());
+                }
+            }
+
+            if (!alreadyBorrowedBooks.isEmpty()) {
+                String bookNames = String.join("、", alreadyBorrowedBooks);
+                throw new BorrowBusinessException(
+                        String.format("以下图书您已借阅且未归还，无法重复借阅：%s", bookNames));
+            }
+        }
+
         // 查询用户信息
         User user = userMapper.getById(userId);
 
