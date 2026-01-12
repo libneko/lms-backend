@@ -24,6 +24,7 @@ import com.neko.vo.BorrowVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
+    @Transactional
     public BorrowSubmitVO borrow(BorrowSubmitDTO borrowSubmitDTO) {
         // 查询借阅车数据
         Long userId = BaseContext.getCurrentId();
@@ -225,6 +227,7 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
+    @Transactional
     public void complete(Long id) {
         // 根据 id 查询借阅记录
         BorrowRecord borrowRecordDB = borrowRecordMapper.getById(id);
