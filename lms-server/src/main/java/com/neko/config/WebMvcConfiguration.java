@@ -14,7 +14,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
     private final JwtTokenUserInterceptor jwtTokenUserInterceptor;
 
-    public WebMvcConfiguration(JwtTokenAdminInterceptor jwtTokenAdminInterceptor, JwtTokenUserInterceptor jwtTokenUserInterceptor) {
+    public WebMvcConfiguration(JwtTokenAdminInterceptor jwtTokenAdminInterceptor,
+            JwtTokenUserInterceptor jwtTokenUserInterceptor) {
         this.jwtTokenAdminInterceptor = jwtTokenAdminInterceptor;
         this.jwtTokenUserInterceptor = jwtTokenUserInterceptor;
     }
