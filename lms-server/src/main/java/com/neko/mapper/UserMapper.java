@@ -17,6 +17,9 @@ public interface UserMapper {
     @Select("select * from users where email = #{email}")
     User getByEmail(String email);
 
+    @Select("select * from users where username = #{username}")
+    User getByUsername(String username);
+
     @Insert("insert into users (username, email, password, phone, sex, avatar, create_time, update_time, status)"
             +
             "values " +

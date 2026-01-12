@@ -13,6 +13,7 @@ import com.neko.exception.AccountLockedException;
 import com.neko.exception.AccountNotFoundException;
 import com.neko.exception.DeletionNotAllowedException;
 import com.neko.exception.PasswordErrorException;
+import com.neko.exception.UserAlreadyExistsException;
 import com.neko.mapper.UserMapper;
 import com.neko.result.PageResult;
 import com.neko.service.MailService;
@@ -47,6 +48,21 @@ public class UserServiceImpl implements UserService {
 
         if (!mailService.verifyCode(email, code)) {
             throw new AccountLockedException(MessageConstant.VERIFY_CODE_ERROR);
+        }
+
+        // 检查邮箱是否已存在
+        User existingUser = userMapper.getByEmail(email);
+        if (existingUser != null) {
+            throw new UserAlreadyExistsException(MessageConstant.EMAIL_ALREADY_EXISTS);
+        }
+
+        // 检查用户名是否已存在
+        String username = userPasswordDTO.getUsername();
+        if (username != null && !username.isEmpty()) {
+            existingUser = userMapper.getByUsername(username);
+            if (existingUser != null) {
+                throw new UserAlreadyExistsException(MessageConstant.USERNAME_ALREADY_EXISTS);
+            }
         }
 
         User user = new User();

@@ -6,8 +6,6 @@ import com.neko.result.PageResult;
 import com.neko.vo.BorrowSubmitVO;
 import com.neko.vo.BorrowVO;
 
-import java.util.List;
-
 public interface BorrowService {
     /**
      * 借阅图书

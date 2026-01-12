@@ -27,12 +27,23 @@ public class GlobalExceptionHandler {
         ServerErrorMessage serverErrorMessage = ex.getServerErrorMessage();
         String detail = serverErrorMessage.getDetail();
         log.info("SQL Error: {}", ex.getMessage());
-        // UNIQUE
         if (serverErrorMessage.getSQLState().equals("23505")) {
             Pattern pattern = Pattern.compile("\\((.*?)\\)=\\((.*?)\\)");
             Matcher matcher = pattern.matcher(detail);
             if (matcher.find()) {
+                String field = matcher.group(1);
                 String value = matcher.group(2);
+                if (field != null) {
+                    switch (field) {
+                        case "username":
+                            return Result.error(MessageConstant.USERNAME_ALREADY_EXISTS);
+                        case "email":
+                            return Result.error(MessageConstant.EMAIL_ALREADY_EXISTS);
+                        default:
+                            String msg = String.format("%s %s", value, MessageConstant.ALREADY_EXISTS);
+                            return Result.error(msg);
+                    }
+                }
                 String msg = String.format("%s %s", value, MessageConstant.ALREADY_EXISTS);
                 return Result.error(msg);
             }

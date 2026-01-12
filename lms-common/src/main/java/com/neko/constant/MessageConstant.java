@@ -18,4 +18,6 @@ public class MessageConstant {
     public static final String BOOK_NOT_AVAILABLE = "图书不可用";
     public static final String USER_IS_ACTIVE = "User is active";
     public static final String VERIFY_CODE_ERROR = "Verify code error";
+    public static final String USERNAME_ALREADY_EXISTS = "Username already exists";
+    public static final String EMAIL_ALREADY_EXISTS = "Email already registered";
 }
