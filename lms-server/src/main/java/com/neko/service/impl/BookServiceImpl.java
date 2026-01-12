@@ -16,6 +16,7 @@ import org.opensearch.action.search.SearchResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.Operator;
 import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.opensearch.search.sort.SortOrder;
@@ -51,13 +52,15 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO, boolean filterOutOfStock) throws IOException {
+    public PageResult<BookVO> pageQuery(BookPageQueryDTO bookPageQueryDTO, boolean filterOutOfStock)
+            throws IOException {
         int from = (bookPageQueryDTO.getPage() - 1) * bookPageQueryDTO.getPageSize();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (bookPageQueryDTO.getName() != null && !bookPageQueryDTO.getName().isEmpty()) {
-            boolQueryBuilder.must(QueryBuilders.matchQuery("after.name", bookPageQueryDTO.getName()));
+            boolQueryBuilder
+                    .must(QueryBuilders.matchQuery("after.name", bookPageQueryDTO.getName()).operator(Operator.AND));
         }
 
         if (bookPageQueryDTO.getCategoryId() != null) {
@@ -97,8 +100,7 @@ public class BookServiceImpl implements BookService {
                             .status((Integer) source.get("status"))
                             .updateTime(LocalDateTime.ofInstant(
                                     Instant.ofEpochMilli(((Number) source.get("update_time")).longValue() / 1000),
-                                    ZoneId.systemDefault()
-                            ))
+                                    ZoneId.systemDefault()))
                             .stock(((Number) source.get("stock")).longValue())
                             .isbn((String) source.get("isbn"))
                             .location((String) source.get("location"))
