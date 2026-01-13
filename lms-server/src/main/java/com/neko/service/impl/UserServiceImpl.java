@@ -56,9 +56,11 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException(MessageConstant.EMAIL_ALREADY_EXISTS);
         }
 
-        // 检查用户名是否已存在
+        // 检查用户名是否已存在，如果未输入则生成默认用户名
         String username = userPasswordDTO.getUsername();
-        if (username != null && !username.isEmpty()) {
+        if (username == null || username.trim().isEmpty()) {
+            username = "图书馆用户_" + CodeUtil.generate(8);
+        } else {
             existingUser = userMapper.getByUsername(username);
             if (existingUser != null) {
                 throw new UserAlreadyExistsException(MessageConstant.USERNAME_ALREADY_EXISTS);
@@ -68,6 +70,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         BeanUtils.copyProperties(userPasswordDTO, user);
 
+        user.setUsername(username);
         user.setPassword(PasswordUtil.hashPassword(user.getPassword()));
         user.setAvatar(avatar);
         user.setStatus(Status.ENABLE.getCode());
