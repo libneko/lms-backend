@@ -1,5 +1,6 @@
 package com.neko.service.impl;
 
+import com.neko.exception.MailBusinessException;
 import com.neko.service.MailService;
 import com.neko.utils.CodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +31,14 @@ public class MailServiceImpl implements MailService {
     public void sendCode(String email) {
         if (email == null || email.trim().isEmpty()) {
             log.error("邮箱地址为空，无法发送验证码");
-            throw new IllegalArgumentException("邮箱地址不能为空");
+            throw new MailBusinessException("邮箱地址不能为空");
         }
 
         // 邮箱格式验证
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (!email.matches(emailRegex)) {
             log.error("邮箱地址格式不正确: {}", email);
-            throw new IllegalArgumentException("邮箱地址格式不正确");
+            throw new MailBusinessException("邮箱地址格式不正确");
         }
 
         String code = CodeUtil.generateCode(6);
