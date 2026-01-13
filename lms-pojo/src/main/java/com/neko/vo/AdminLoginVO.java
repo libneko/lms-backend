@@ -19,5 +19,7 @@ public class AdminLoginVO implements Serializable {
 
     private String password;
 
+    private String avatar;
+
     private String token;
 }

@@ -46,6 +46,7 @@ public class AdminController {
                 .id(admin.getId())
                 .username(admin.getUsername())
                 .password(admin.getPassword())
+                .avatar(admin.getAvatar())
                 .token(token)
                 .build();
 
