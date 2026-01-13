@@ -699,7 +699,7 @@ CREATE TABLE users
     email         VARCHAR(32) NOT NULL,                                      -- 邮箱
     password      VARCHAR(128),                                              -- 密码
     phone         VARCHAR(11),                                               -- 手机号
-    sex           INTEGER CHECK (sex IN (0, 1, 2)),                          -- 性别 0:女 1:男 2:未知
+    sex           INTEGER DEFAULT 1 CHECK (sex IN (0, 1)),                   -- 性别 0:女 1:男
     avatar        VARCHAR(128),                                              -- 头像
     status        INT         NOT NULL DEFAULT 1 CHECK (status IN (0, 1)),   -- 状态 0:禁用，1:启用
     overdue_count INT         NOT NULL DEFAULT 0 CHECK (overdue_count >= 0), -- 逾期次数（不能为负数）
