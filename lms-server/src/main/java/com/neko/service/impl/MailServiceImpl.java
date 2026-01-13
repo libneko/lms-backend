@@ -63,8 +63,6 @@ public class MailServiceImpl implements MailService {
         String redisCode = stringRedisTemplate.opsForValue().get(key);
 
         if (redisCode != null && redisCode.equals(code)) {
-            // 验证成功后可以删除
-            stringRedisTemplate.delete(key);
             return true;
         }
         return false;
