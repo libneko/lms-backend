@@ -5,6 +5,7 @@ import com.neko.dto.BookDTO;
 import com.neko.dto.BookPageQueryDTO;
 import com.neko.entity.Book;
 import com.neko.enums.Status;
+import com.neko.exception.BookBusinessException;
 import com.neko.exception.DeletionNotAllowedException;
 import com.neko.mapper.BookMapper;
 import com.neko.result.PageResult;
@@ -126,6 +127,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookVO getById(Long id) {
         Book book = bookMapper.getById(id);
+        if (book == null) {
+            throw new BookBusinessException(MessageConstant.BOOK_NOT_AVAILABLE);
+        }
         BookVO bookVO = new BookVO();
         BeanUtils.copyProperties(book, bookVO);
         return bookVO;
