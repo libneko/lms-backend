@@ -21,14 +21,17 @@ import com.neko.result.PageResult;
 import com.neko.service.BorrowService;
 import com.neko.vo.BorrowSubmitVO;
 import com.neko.vo.BorrowVO;
+import com.neko.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,15 +42,20 @@ public class BorrowServiceImpl implements BorrowService {
     private final BorrowDetailMapper borrowDetailMapper;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
+    private final WebSocketServer webSocketServer;
+    private final ObjectMapper objectMapper;
 
     public BorrowServiceImpl(BorrowCartMapper borrowCartMapper,
             BorrowRecordMapper borrowRecordMapper, BorrowDetailMapper borrowDetailMapper,
-            UserMapper userMapper, BookMapper bookMapper) {
+            UserMapper userMapper, BookMapper bookMapper,
+            WebSocketServer webSocketServer, ObjectMapper objectMapper) {
         this.borrowCartMapper = borrowCartMapper;
         this.borrowRecordMapper = borrowRecordMapper;
         this.borrowDetailMapper = borrowDetailMapper;
         this.userMapper = userMapper;
         this.bookMapper = bookMapper;
+        this.webSocketServer = webSocketServer;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -151,6 +159,9 @@ public class BorrowServiceImpl implements BorrowService {
             // 选择性借阅，只删除已借阅的图书
             borrowCartMapper.deleteByUserIdAndBookIds(userId, borrowSubmitDTO.getBookIds());
         }
+
+        // 发送借阅通知
+        sendBorrowNotification(borrowRecord, itemsToBorrow);
 
         return BorrowSubmitVO.builder()
                 .id(borrowRecord.getId())
@@ -306,5 +317,31 @@ public class BorrowServiceImpl implements BorrowService {
         log.info("续借成功，借阅记录 ID: {}, 新的到期时间: {}", id, updateRecord.getDueDate());
 
         return true;
+    }
+
+    /**
+     * 发送借阅通知
+     *
+     * @param borrowRecord  借阅记录
+     * @param itemsToBorrow 借阅的图书列表
+     */
+    private void sendBorrowNotification(BorrowRecord borrowRecord, List<BorrowCart> itemsToBorrow) {
+        // 构建图书列表字符串
+        String bookList = itemsToBorrow.stream()
+                .map(cart -> cart.getName() + " x" + cart.getNumber())
+                .collect(Collectors.joining(", "));
+
+        Map<String, Object> map = Map.of(
+                "type", 1, // 1表示借阅通知
+                "borrowRecordId", borrowRecord.getId(),
+                "borrowNumber", borrowRecord.getNumber(),
+                "userName", borrowRecord.getUserName(),
+                "content", "用户 " + borrowRecord.getUserName() + " 借阅了图书：" + bookList);
+
+        try {
+            webSocketServer.sendToAllClient(objectMapper.writeValueAsString(map));
+        } catch (Exception e) {
+            log.error("发送借阅通知失败", e);
+        }
     }
 }
