@@ -765,3 +765,12 @@ CREATE TABLE borrow_details
     CONSTRAINT fk_borrow_details_record FOREIGN KEY (borrow_record_id) REFERENCES borrow_records (id) ON DELETE CASCADE, -- 借阅记录外键，级联删除
     CONSTRAINT fk_borrow_details_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE SET NULL                      -- 书籍外键，删除书籍时设为NULL
 );
+
+-- ========================================
+-- Mock数据：为张三创建借阅记录用于测试续借功能
+INSERT INTO borrow_records (number, status, user_id, borrow_time, user_name, due_date, renew_count)
+VALUES ('BR202601140002', 1, 1, '2025-12-18T14:30:00', 'zhangsan', '2026-01-18T14:30:00', 1);
+
+INSERT INTO borrow_details (name, image, borrow_record_id, book_id, number)
+VALUES ('红楼梦', 'https://neko-book.oss-cn-hangzhou.aliyuncs.com/book_img/2907482c7cdf48be892cbec280b01ca6.jpg',
+        (SELECT id FROM borrow_records WHERE number = 'BR202601140002'), 13, 1);
